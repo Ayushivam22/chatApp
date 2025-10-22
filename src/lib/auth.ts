@@ -5,6 +5,8 @@ import connectDB from './db';
 import User from '@/models/User';
 
 export const authOptions: NextAuthOptions = {
+    // Ensure NextAuth has the secret available to sign/decrypt JWTs
+    secret: process.env.NEXTAUTH_SECRET,
     providers: [
         CredentialsProvider({
             name: 'credentials',
@@ -21,11 +23,11 @@ export const authOptions: NextAuthOptions = {
                 try {
                     console.log("Mongo connection : ");
                     const mongo = await connectDB();
-                    console.log("Mongo connected",mongo)
+                    // console.log("Mongo connected",mongo)
 
                     const user = await User.findOne({ email: credentials.email }).select('+password');
 
-                    console.log('User is ', user);
+                    console.log('User is ', user.Email);
                     if (!user) {
                         return null;
                     }
@@ -53,8 +55,7 @@ export const authOptions: NextAuthOptions = {
     },
     callbacks: {
         async jwt({ token, user }) {
-            if(user)
-            {
+            if (user) {
                 token.id = user.id;
             }
             return token;

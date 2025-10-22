@@ -3,7 +3,7 @@ import SignupForm from "@/components/SignupForm";
 export default function Signup() {
     return (
         <div className="flex justify-center items-center min-h-screen">
-            <div className="flex flex-col gap-6 items-center w-full max-w-md backdrop-blur-md border border-neutral-500 rounded-2xl p-10 shadow-2xl">
+            <div className="flex flex-col gap-6 items-center w-full max-w-md backdrop-blur-md border border-neutral-500 rounded-2xl p-10 shadow-2xl bg-black/30">
                 <h1 className="text-3xl text-yellow-50 font-bold w-full text-center mb-2">
                     Create Your Account
                 </h1>
