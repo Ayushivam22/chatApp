@@ -1,7 +1,8 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema, Types } from 'mongoose';
 
 export interface IUser extends Document {
   name: string;
+  username: string;
   email: string;
   password: string;
   createdAt: Date;
@@ -12,6 +13,12 @@ const UserSchema: Schema = new Schema({
     type: String,
     required: [true, 'Please provide a name'],
     maxlength: [60, 'Name cannot be more than 60 characters'],
+  },
+  username: {
+    type: String,
+    required: [true, 'Please provide a username'],
+    unique: true,
+    trim: true,
   },
   email: {
     type: String,
@@ -29,7 +36,7 @@ const UserSchema: Schema = new Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-  },
+  }
 });
 
 export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);

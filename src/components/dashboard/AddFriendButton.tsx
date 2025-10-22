@@ -3,18 +3,20 @@
 import React, { useState } from "react";
 
 // Mock API function
-async function addFriend(username: string): Promise<{ success: boolean; message: string }> {
-    console.log(`Attempting to add friend: ${username}`);
-    // Simulate API call
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            if (username.toLowerCase() === "friend_exists") {
-                resolve({ success: true, message: "Friend added successfully!" });
-            } else {
-                resolve({ success: false, message: "User not found." });
-            }
-        }, 1000);
+async function sendFriendRequest(
+    username: string
+): Promise<{ success: boolean; message: string }> {
+    const response = await fetch("/api/friends/request", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username }),
     });
+
+    const data = await response.json();
+
+    return { success: response.ok, message: data.message };
 }
 
 const AddFriendButton: React.FC = () => {
@@ -29,7 +31,7 @@ const AddFriendButton: React.FC = () => {
 
         setIsLoading(true);
         setStatusMessage("");
-        const result = await addFriend(username);
+        const result = await sendFriendRequest(username);
         setStatusMessage(result.message);
         setIsLoading(false);
 
@@ -55,7 +57,9 @@ const AddFriendButton: React.FC = () => {
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50">
                     <div className="bg-neutral-800 rounded-2xl p-8 shadow-2xl w-full max-w-md border border-neutral-700">
-                        <h2 className="text-2xl font-bold text-white mb-4">Add a Friend</h2>
+                        <h2 className="text-2xl font-bold text-white mb-4">
+                            Add a Friend
+                        </h2>
                         <p className="text-gray-400 mb-6">
                             Enter your friend's username to send a request.
                         </p>

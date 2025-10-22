@@ -27,7 +27,7 @@ export const authOptions: NextAuthOptions = {
 
                     const user = await User.findOne({ email: credentials.email }).select('+password');
 
-                    console.log('User is ', user.Email);
+                    console.log('User is ', user?.email);
                     if (!user) {
                         return null;
                     }
@@ -41,6 +41,7 @@ export const authOptions: NextAuthOptions = {
                     return {
                         id: user._id.toString(),
                         email: user.email,
+                        username: user.username,
                         name: user.name,
                     };
                 } catch (error) {
@@ -58,6 +59,7 @@ export const authOptions: NextAuthOptions = {
             if (user) {
                 token.id = user.id;
             }
+            // console.log("Token : ",token)
             return token;
         },
         async session({ session, token }) {
