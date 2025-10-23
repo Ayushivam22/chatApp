@@ -1,20 +1,22 @@
 "use client";
 
 import React, { useState } from "react";
-import { User, FriendRequest } from "@/types";
+import { User, Friend, FriendRequest } from "@/types";
 import AddFriendButton from "./AddFriendButton";
 import { Check, X } from "lucide-react";
 
 interface SidebarProps {
     user: User;
-    friends: User[];
+    friends: Friend[];
     initialPendingRequests: FriendRequest[];
+    onSelectFriend: (friend: Friend) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
     user,
     friends = [],
     initialPendingRequests = [],
+    onSelectFriend,
 }) => {
     const [pendingRequests, setPendingRequests] = useState(
         initialPendingRequests
@@ -150,6 +152,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     {friends.map((friend) => (
                         <li
                             key={friend.id}
+                            onClick={() => onSelectFriend(friend)}
                             className="flex items-center gap-3 p-2 rounded-lg hover:bg-neutral-700 cursor-pointer transition-colors"
                         >
                             <div className="relative">

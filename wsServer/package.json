@@ -1,0 +1,22 @@
+{
+  "name": "wsserver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc --build",
+    "start": "node server.js",
+    "dev": "tsc --build && node dist/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@types/ws": "^8.18.1",
+    "tsc": "^2.0.4",
+    "typescript": "^5.9.3",
+    "ws": "^8.18.3"
+  }
+}
