@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { User, Friend, FriendRequest } from "@/types";
 import AddFriendButton from "./AddFriendButton";
+import Avatar from "@/components/common/Avatar";
 import { Check, X } from "lucide-react";
 
 interface SidebarProps {
@@ -59,11 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             {/* User Profile Section */}
             <div className="flex items-center bg-red-200 gap-4 mb-6 p-2">
                 <div>
-                    <img
-                        src={user.image || "/default-avatar.png"}
-                        alt={user.name || "User Avatar"}
-                        className="w-12 h-12 rounded-full object-cover"
-                    />
+                    <Avatar src={user.image} alt={user.name || "User Avatar"} size={48} />
                     <div>
                         <h2 className="font-semibold text-lg text-white">
                             {user.name || user.email}
@@ -156,11 +153,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                             className="flex items-center gap-3 p-2 rounded-lg hover:bg-neutral-700 cursor-pointer transition-colors"
                         >
                             <div className="relative">
-                                <img
-                                    src={friend.image || "/default-avatar.png"}
-                                    alt={friend.name || "Friend"}
-                                    className="w-10 h-10 rounded-full object-cover"
-                                />
+                                <Avatar src={friend.image} alt={friend.name || "Friend"} size={40} />
                                 {friend.status === "online" && (
                                     <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-neutral-800"></span>
                                 )}

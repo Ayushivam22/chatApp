@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { User, Friend, Chat, FriendRequest } from "@/types";
 import Sidebar from "./Sidebar";
-import ChatList from "./ChatList";
+// import ChatList from "./ChatList";
 import ChatWindow from "./ChatWindow";
+import { useWebSocket } from "@/contexts/WebSocketContext";
 
 interface DashboardClientProps {
     user: User;
@@ -21,35 +22,9 @@ export default function DashboardClient({
 }: DashboardClientProps) {
     const [activeChat, setActiveChat] = useState<Chat | null>(null);
     const [chats, setChats] = useState<Chat[]>(initialChats);
+    const ws = useWebSocket();
 
-    // This is a placeholder for a real WebSocket connection
-    useEffect(() => {
-        if (activeChat) {
-            console.log(
-                `Connecting to WebSocket for chat with ${activeChat.participants[0].name}`
-            );
-            const ws = new WebSocket("ws://localhost:8080"); // Connect to our local server
-
-            ws.onopen = () => {
-                console.log("WebSocket connection established.");
-                ws.send(`Hello from ${user.name}!`);
-            };
-
-            ws.onmessage = (event) => {
-                console.log("Received message:", event.data);
-                // Here you would handle incoming messages and update the chat state
-            };
-
-            ws.onclose = () => {
-                console.log("WebSocket connection closed.");
-            };
-
-            // Clean up the connection when the component unmounts or activeChat changes
-            return () => {
-                ws.close();
-            };
-        }
-    }, [activeChat, user.name]);
+    // WebSocket connection is handled by WebSocketProvider
 
     const handleSelectFriend = (friend: Friend) => {
         // Find if a chat with this friend already exists
@@ -59,6 +34,8 @@ export default function DashboardClient({
 
         if (existingChat) {
             setActiveChat(existingChat);
+            ws.connect(friend.id);
+            ws.setRecipient(friend.id);
         } else {
             // Create a new local chat object. In a real app, you'd likely create this on the server.
             const newChat: Chat = {
@@ -70,6 +47,17 @@ export default function DashboardClient({
             };
             setChats((prev) => [newChat, ...prev]);
             setActiveChat(newChat);
+            ws.connect(friend.id);
+            ws.setRecipient(friend.id);
+        }
+    };
+
+    const handleSelectChat = (chat: Chat) => {
+        setActiveChat(chat);
+        const recipientId = chat.participants[0]?.id;
+        if (recipientId) {
+            ws.connect(recipientId);
+            ws.setRecipient(recipientId);
         }
     };
 
@@ -82,7 +70,7 @@ export default function DashboardClient({
                 onSelectFriend={handleSelectFriend}
             />
             <div className="col-span-12 md:col-span-9 flex flex-col">
-                <ChatList initialChats={chats} onSelectChat={setActiveChat} />
+                {/* Chats list removed as requested */}
                 <ChatWindow activeChat={activeChat} currentUser={user} />
             </div>
         </div>

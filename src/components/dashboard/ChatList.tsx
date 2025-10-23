@@ -5,14 +5,17 @@ import { Chat } from "@/types";
 
 interface ChatListProps {
     initialChats: Chat[];
+    onSelectChat?: (chat: Chat) => void;
 }
 
-const ChatList: React.FC<ChatListProps> = ({ initialChats }) => {
+const ChatList: React.FC<ChatListProps> = ({ initialChats, onSelectChat }) => {
     const [chats, setChats] = useState<Chat[]>(initialChats);
     const [activeChatId, setActiveChatId] = useState<string | null>(null);
 
     const handleChatClick = (chatId: string) => {
         setActiveChatId(chatId);
+        const selected = chats.find((c) => c.id === chatId);
+        if (selected && onSelectChat) onSelectChat(selected);
         // In a real app, you would also mark messages as read here
     };
 

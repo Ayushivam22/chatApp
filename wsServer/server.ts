@@ -1,63 +1,150 @@
 import { WebSocketServer, WebSocket } from 'ws';
 
+interface User {
+    userId: string;
+    username: string;
+    ws: WebSocket;
+}
+
+interface Message {
+    type: 'message' | 'userList' | 'error' | 'userConnected' | 'userDisconnected';
+    from?: string;
+    to?: string;
+    content?: string;
+    users?: { userId: string; username: string }[];
+    timestamp?: string;
+}
+
 const wss = new WebSocketServer({ port: 8080 });
-const clients = new Map<string, WebSocket>();
-const allClients = new Map<string, WebSocket>();
+const activeUsers = new Map<string, User>();
 
-wss.on('connection', (ws, req) => {
+function broadcastUserList() {
+    const userList = Array.from(activeUsers.values()).map(({ userId, username }) => ({
+        userId,
+        username
+    }));
 
-    // will remove later
-    allClients.set('user', ws);
+    const message: Message = {
+        type: 'userList',
+        users: userList
+    };
+
+    activeUsers.forEach(user => {
+        if (user.ws.readyState === WebSocket.OPEN) {
+            user.ws.send(JSON.stringify(message));
+        }
+    });
+}
+
+wss.on('connection', (ws: WebSocket, req) => {
     const urlParams = new URLSearchParams(req.url?.split('?')[1]);
-    const userId = urlParams.get('userId') || (1000 + Math.floor(Math.random() * 1000)).toString();
-    // if (!userId) {
-    // return ws.close();
-    // }
+    const userId = urlParams.get('userId') || `user-${Date.now()}`;
+    const username = urlParams.get('username') || `User-${Math.floor(Math.random() * 1000)}`;
 
-    clients.set(userId, ws);
-    console.log(`User ${userId} connected`);
+    // Add user to active users
+    const user: User = { userId, username, ws };
+    activeUsers.set(userId, user);
+    console.log(`User ${username} (${userId}) connected`);
 
-    ws.on('message', (rawMessage) => {
-        try {
-            // will remove later
-            // console.log("Printing raw message:", rawMessage)
-            const messageData = JSON.parse(rawMessage.toString());
-            
-
-            console.log(messageData)
-            const broadcastMessage = [messageData['message-content'],
-                {
-                    from: userId,
-                    timeStamp: new Date().toLocaleString()
-                }
-            ]
-            allClients.forEach((user) => {
-                // console.log(user)
-                if (user.readyState === WebSocket.OPEN) {
-                    user.send(JSON.stringify(
-                        messageData['message-content']
-                    ))
-                }
-            })
-
-
-
-            // const { to, text } = JSON.parse(rawMessage.toString());
-            // const targetWs = clients.get(to);
-            // if (targetWs && targetWs.readyState === WebSocket.OPEN) {
-            //     targetWs.send(JSON.stringify({ from: userId, text }));
-            // }
-        } catch (err) {
-            // console.error('Invalid message format', err);
+    // Notify all users about the new connection
+    const connectMessage: Message = {
+        type: 'userConnected',
+        from: userId,
+        content: `${username} has joined the chat`,
+        timestamp: new Date().toISOString()
+    };
+    
+    activeUsers.forEach(u => {
+        if (u.ws.readyState === WebSocket.OPEN) {
+            u.ws.send(JSON.stringify(connectMessage));
         }
     });
 
-    ws.on('close', () => {
-        clients.delete(userId);
-        console.log(`User ${userId} disconnected`);
+    // Send current user list to all clients
+    broadcastUserList();
+
+    // Handle incoming messages
+    ws.on('message', (rawMessage: string) => {
+        try {
+            const message: Message = JSON.parse(rawMessage.toString());
+            console.log('Received message:', message);
+            
+            if (message.type === 'message' && message.to && message.content) {
+                const recipient = activeUsers.get(message.to);
+                const sender = activeUsers.get(userId);
+                
+                if (recipient && recipient.ws.readyState === WebSocket.OPEN) {
+                    const privateMessage: Message = {
+                        type: 'message',
+                        from: userId,
+                        to: message.to,
+                        content: message.content,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    // Send to recipient
+                    recipient.ws.send(JSON.stringify(privateMessage));
+                    
+                    // Send back to sender for their own message history
+                    if (sender?.ws.readyState === WebSocket.OPEN) {
+                        sender.ws.send(JSON.stringify({
+                            ...privateMessage,
+                            isOwn: true
+                        }));
+                    }
+                } else {
+                    console.warn(`Recipient ${message.to} not connected or socket not open.`);
+                    if (sender?.ws.readyState === WebSocket.OPEN) {
+                        sender.ws.send(JSON.stringify({
+                            type: 'error',
+                            content: `User ${message.to} is not connected`,
+                            timestamp: new Date().toISOString()
+                        }));
+                    }
+                }
+            }
+        } catch (err) {
+            console.error('Error processing message:', err);
+            const errorMessage: Message = {
+                type: 'error',
+                content: 'Invalid message format'
+            };
+            ws.send(JSON.stringify(errorMessage));
+        }
     });
 
-    ws.on('error', () => clients.delete(userId));
+    // Handle client disconnection
+    ws.on('close', () => {
+        const disconnectedUser = activeUsers.get(userId);
+        if (disconnectedUser) {
+            console.log(`User ${disconnectedUser.username} (${userId}) disconnected`);
+            
+            // Notify all users about the disconnection
+            const disconnectMessage: Message = {
+                type: 'userDisconnected',
+                from: userId,
+                content: `${disconnectedUser.username} has left the chat`,
+                timestamp: new Date().toISOString()
+            };
+            
+            activeUsers.forEach(u => {
+                if (u.ws.readyState === WebSocket.OPEN) {
+                    u.ws.send(JSON.stringify(disconnectMessage));
+                }
+            });
+            
+            // Remove user from active users
+            activeUsers.delete(userId);
+            broadcastUserList();
+        }
+    });
+
+    // Handle errors
+    ws.on('error', (error) => {
+        console.error('WebSocket error:', error);
+        activeUsers.delete(userId);
+        broadcastUserList();
+    });
 });
 
-console.log('WebSocket server running on port 8080');
+console.log('WebSocket server running on ws://localhost:8080');

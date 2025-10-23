@@ -5,6 +5,7 @@ import connectDB from "@/lib/db";
 import { User as UserType } from "@/types";
 import { fetchFriends, fetchChats, fetchPendingRequests } from "@/lib/data";
 import DashboardClient from "@/components/dashboard/DashboardClient";
+import { WebSocketProvider } from "@/contexts/WebSocketContext";
 
 export default async function Dashboard() {
     await connectDB();
@@ -30,11 +31,13 @@ export default async function Dashboard() {
     ]);
 
     return (
-        <DashboardClient
-            user={currentUser}
-            friends={friends}
-            initialPendingRequests={pendingRequests}
-            initialChats={chats}
-        />
+        <WebSocketProvider userId={currentUser.id} username={currentUser.name || currentUser.email || "User"}>
+            <DashboardClient
+                user={currentUser}
+                friends={friends}
+                initialPendingRequests={pendingRequests}
+                initialChats={chats}
+            />
+        </WebSocketProvider>
     );
 }
