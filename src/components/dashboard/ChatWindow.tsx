@@ -3,13 +3,15 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Chat, User } from "@/types";
 import { useWebSocket } from "@/contexts/WebSocketContext";
+import Avatar from "@/components/common/Avatar";
 
 interface ChatWindowProps {
     activeChat: Chat | null;
     currentUser: User;
+    onOpenFriends?: () => void; // mobile toggle
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ activeChat, currentUser }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ activeChat, currentUser, onOpenFriends }) => {
     const [message, setMessage] = useState("");
     const { messages, sendMessage, isConnected } = useWebSocket();
     const bottomRef = useRef<HTMLDivElement>(null);
@@ -41,6 +43,17 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ activeChat, currentUser }) => {
     if (!activeChat) {
         return (
             <div className="flex flex-col flex-1 bg-neutral-900">
+                {/* Mobile header with friends toggle */}
+                <div className="md:hidden flex items-center justify-between p-3 border-b border-neutral-800">
+                    <button
+                        onClick={onOpenFriends}
+                        className="px-3 py-2 rounded-md bg-neutral-800 text-gray-200"
+                    >
+                        Friends
+                    </button>
+                    <div className="text-gray-300 text-sm">No chat selected</div>
+                    <div className="w-16" />
+                </div>
                 <div className="flex-1 flex justify-center items-center">
                     <div className="text-center">
                         <h3 className="text-2xl font-semibold text-gray-400">
@@ -74,17 +87,22 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ activeChat, currentUser }) => {
     const op = otherParticipant!;
 
     return (
-        <div className="hidden md:flex md:flex-col md:col-span-6 flex-1 bg-neutral-900">
+        <div className="flex flex-col flex-1 bg-neutral-900">
             {/* Chat Header */}
-            <div className="flex items-center p-4 border-b border-neutral-800">
-                <img
-                    src={op.image || "/default-avatar.png"}
-                    alt={op.name || "User"}
-                    className="w-10 h-10 rounded-full object-cover mr-4"
-                />
-                <h3 className="text-lg font-semibold text-white">
-                    {op.name}
-                </h3>
+            <div className="flex items-center justify-between p-4 border-b border-neutral-800">
+                <button
+                    onClick={onOpenFriends}
+                    className="md:hidden px-3 py-2 rounded-md bg-neutral-800 text-gray-200"
+                >
+                    Friends
+                </button>
+                <div className="flex items-center gap-3">
+                    <Avatar src={op.image} alt={op.name || "User"} size={40} />
+                    <h3 className="text-lg font-semibold text-white">
+                        {op.name}
+                    </h3>
+                </div>
+                <div className="w-20" />
             </div>
 
             {/* Message Area */}
@@ -98,10 +116,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ activeChat, currentUser }) => {
                         return (
                             <div key={idx} className={`flex items-start gap-3 ${isMine ? "justify-end" : "justify-start"}`}>
                                 {!isMine && (
-                                    <img
-                                        src={sender.image || "/default-avatar.png"}
+                                    <Avatar
+                                        src={sender.image}
                                         alt={sender.name || sender.email || "User"}
-                                        className="w-9 h-9 rounded-full object-cover mt-1"
+                                        size={36}
+                                        className="mt-1"
                                     />
                                 )}
                                 <div className={`max-w-[70%]`}
@@ -119,10 +138,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ activeChat, currentUser }) => {
                                     </div>
                                 </div>
                                 {isMine && (
-                                    <img
-                                        src={sender.image || "/default-avatar.png"}
+                                    <Avatar
+                                        src={sender.image}
                                         alt={sender.name || sender.email || "You"}
-                                        className="w-9 h-9 rounded-full object-cover mt-1"
+                                        size={36}
+                                        className="mt-1"
                                     />
                                 )}
                             </div>

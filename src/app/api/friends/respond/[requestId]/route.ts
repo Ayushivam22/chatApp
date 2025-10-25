@@ -7,7 +7,7 @@ import Friendship from '@/models/Friendship';
 import FriendRequest from '@/models/FriendRequest';
 import mongoose from 'mongoose';
 
-export async function POST(req: Request, { params }: { params: { requestId: string } }) {
+export async function POST(req: Request, ctx: { params: Promise<{ requestId: string }> }) {
   try {
     await connectDB();
     const session = await getServerSession(authOptions);
@@ -20,7 +20,7 @@ export async function POST(req: Request, { params }: { params: { requestId: stri
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    const { requestId } = params;
+    const { requestId } = await ctx.params;
     const { status } = await req.json(); // 'accepted' or 'rejected'
 
     if (!['accepted', 'rejected'].includes(status)) {

@@ -6,6 +6,7 @@ import Sidebar from "./Sidebar";
 // import ChatList from "./ChatList";
 import ChatWindow from "./ChatWindow";
 import { useWebSocket } from "@/contexts/WebSocketContext";
+import MobileFriendsDrawer from "./MobileFriendsDrawer";
 
 interface DashboardClientProps {
     user: User;
@@ -23,6 +24,7 @@ export default function DashboardClient({
     const [activeChat, setActiveChat] = useState<Chat | null>(null);
     const [chats, setChats] = useState<Chat[]>(initialChats);
     const ws = useWebSocket();
+    const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
     // WebSocket connection is handled by WebSocketProvider
 
@@ -71,8 +73,21 @@ export default function DashboardClient({
             />
             <div className="col-span-12 md:col-span-9 flex flex-col">
                 {/* Chats list removed as requested */}
-                <ChatWindow activeChat={activeChat} currentUser={user} />
+                <ChatWindow
+                    activeChat={activeChat}
+                    currentUser={user}
+                    onOpenFriends={() => setIsMobileDrawerOpen(true)}
+                />
             </div>
+            {isMobileDrawerOpen && (
+                <MobileFriendsDrawer
+                    user={user}
+                    friends={friends}
+                    initialPendingRequests={initialPendingRequests}
+                    onSelectFriend={handleSelectFriend}
+                    onClose={() => setIsMobileDrawerOpen(false)}
+                />
+            )}
         </div>
     );
 }

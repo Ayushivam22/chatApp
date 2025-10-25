@@ -58,9 +58,13 @@ const Sidebar: React.FC<SidebarProps> = ({
     return (
         <aside className="hidden md:flex md:flex-col md:col-span-3 bg-neutral-800 p-4 border-r border-neutral-700">
             {/* User Profile Section */}
-            <div className="flex items-center bg-red-200 gap-4 mb-6 p-2">
+            <div className="flex items-center  gap-4 mb-6 p-2">
                 <div>
-                    <Avatar src={user.image} alt={user.name || "User Avatar"} size={48} />
+                    <Avatar
+                        src={user.image}
+                        alt={user.name || "User Avatar"}
+                        size={48}
+                    />
                     <div>
                         <h2 className="font-semibold text-lg text-white">
                             {user.name || user.email}
@@ -141,7 +145,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             )}
 
             {/* Friends List */}
-            <div className="flex-1 bg-amber-400 overflow-y-auto mt-4">
+            <div className="flex-1  overflow-y-auto mt-4">
                 <h3 className="text-md font-semibold text-gray-400 mb-2 px-2">
                     Friends
                 </h3>
@@ -153,7 +157,11 @@ const Sidebar: React.FC<SidebarProps> = ({
                             className="flex items-center gap-3 p-2 rounded-lg hover:bg-neutral-700 cursor-pointer transition-colors"
                         >
                             <div className="relative">
-                                <Avatar src={friend.image} alt={friend.name || "Friend"} size={40} />
+                                <Avatar
+                                    src={friend.image}
+                                    alt={friend.name || "Friend"}
+                                    size={40}
+                                />
                                 {friend.status === "online" && (
                                     <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-neutral-800"></span>
                                 )}
