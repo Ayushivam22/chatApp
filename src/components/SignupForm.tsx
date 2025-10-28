@@ -1,12 +1,16 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
-import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaLock, FaUserTag } from "react-icons/fa";
 
 export default function SignupForm() {
     const Router = useRouter();
-    const [form, setForm] = useState({ name: "", email: "", password: "" });
+    const [form, setForm] = useState({
+        name: "",
+        username: "",
+        email: "",
+        password: "",
+    });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
@@ -36,7 +40,7 @@ export default function SignupForm() {
             }
 
             setSuccess(true);
-            setForm({ name: "", email: "", password: "" });
+            setForm({ name: "", username: "", email: "", password: "" });
             Router.push("/auth/signin");
         } catch (err: any) {
             setError(err.message);
@@ -54,6 +58,18 @@ export default function SignupForm() {
                     name="name"
                     placeholder="Enter your name"
                     value={form.name}
+                    onChange={handleChange}
+                    className="pl-10 pr-4 py-2 rounded-lg border border-neutral-600 w-full text-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-900 transition placeholder-gray-300"
+                    required
+                />
+            </div>
+            <div className="relative">
+                <FaUserTag className="absolute left-3 top-3 text-gray-100" />
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="Choose a unique username"
+                    value={form.username}
                     onChange={handleChange}
                     className="pl-10 pr-4 py-2 rounded-lg border border-neutral-600 w-full text-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-900 transition placeholder-gray-300"
                     required

@@ -60,7 +60,7 @@ export const WebSocketProvider: React.FC<{
             if (recipientId) setSelectedRecipientId(recipientId);
             return;
         }
-        const wsUrl = `ws://${process.env.NEXT_PUBLIC_WEBSOCKET_URL}:8080?userId=${encodeURIComponent(
+        const wsUrl = `wss://${process.env.NEXT_PUBLIC_WEBSOCKET_URL}?userId=${encodeURIComponent(
             userId
         )}&username=${encodeURIComponent(username)}`;
         const socket = new WebSocket(wsUrl);
