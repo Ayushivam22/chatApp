@@ -1,3 +1,11 @@
+#FEW TEST CREDENTIALS
+email -> test2@gmail.com
+password -> test123
+
+email -> test3@gmail.com
+password -> test123
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
