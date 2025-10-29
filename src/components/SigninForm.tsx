@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { FaEnvelope, FaLock } from "react-icons/fa";
+import { IoEye, IoEyeOff } from "react-icons/io5";
 
 export default function SigninForm() {
     const router = useRouter();
@@ -65,10 +66,10 @@ export default function SigninForm() {
                     required
                 />
                 <span
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-amber-800 cursor-pointer select-none"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-xl text-amber-800 cursor-pointer select-none"
                     onClick={() => setShowPassword(!showPassword)}
                 >
-                    {showPassword ? "hide" : "show"}
+                    {showPassword ? <IoEyeOff/> : <IoEye/>}
                 </span>
             </div>
             <button

@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaUser, FaEnvelope, FaLock, FaUserTag } from "react-icons/fa";
+import { IoEye, IoEyeOff } from "react-icons/io5";
 
 export default function SignupForm() {
     const Router = useRouter();
@@ -99,10 +100,10 @@ export default function SignupForm() {
                     required
                 />
                 <span
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-amber-800 cursor-pointer select-none"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-xl text-amber-800 cursor-pointer select-none"
                     onClick={() => setShowPassword(!showPassword)}
                 >
-                    {showPassword ? "hide" : "show"}
+                    {showPassword ? <IoEyeOff /> : <IoEye />}
                 </span>
             </div>
             <button
